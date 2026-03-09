@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Morning Briefing · Gustavo</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d0f18;
+      --surface: #161929;
+      --surface2: #1e2236;
+      --border: #2a2f4a;
+      --text: #e2e8f0;
+      --muted: #8892aa;
+      --blue: #4f8ef7;
+      --blue-soft: rgba(79,142,247,0.12);
+      --green: #34d399;
+      --green-soft: rgba(52,211,153,0.12);
+      --orange: #fb923c;
+      --orange-soft: rgba(251,146,60,0.12);
+      --red: #f87171;
+      --red-soft: rgba(248,113,113,0.12);
+      --purple: #a78bfa;
+      --purple-soft: rgba(167,139,250,0.12);
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      padding: 2rem 2rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .header-left h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .header-left h1 span { color: var(--blue); }
+    .header-date {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-top: 0.15rem;
+    }
+    .header-right {
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-align: right;
+    }
+    .status-dot {
+      display: inline-block;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      margin-right: 5px;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* ── Layout ── */
+    main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+    .full-width { grid-column: 1 / -1; }
+
+    /* ── Section ── */
+    section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .section-header {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .section-header h2 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+    }
+    .section-icon { font-size: 1rem; }
+    .badge {
+      margin-left: auto;
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 999px;
+    }
+    .badge-blue { background: var(--blue-soft); color: var(--blue); }
+    .badge-green { background: var(--green-soft); color: var(--green); }
+    .badge-orange { background: var(--orange-soft); color: var(--orange); }
+    .badge-red { background: var(--red-soft); color: var(--red); }
+
+    .section-body { padding: 1rem 1.25rem; }
+    .empty-state {
+      text-align: center;
+      padding: 1.5rem;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+    .empty-state .emoji { font-size: 1.5rem; display: block; margin-bottom: 0.4rem; }
+
+    /* ── Meeting Card ── */
+    .meeting-card {
+      display: flex;
+      gap: 1rem;
+      padding: 0.8rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .meeting-card:last-child { border-bottom: none; }
+    .meeting-time {
+      min-width: 80px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--blue);
+      padding-top: 2px;
+    }
+    .meeting-info { flex: 1; }
+    .meeting-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .meeting-meta {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .soon-badge {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: var(--red-soft);
+      color: var(--red);
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+
+    /* ── Email Card ── */
+    .email-card {
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .email-card:last-child { border-bottom: none; }
+    .email-from {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-bottom: 2px;
+    }
+    .email-subject {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .email-preview {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+    .action-badge {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 4px;
+      background: var(--orange-soft);
+      color: var(--orange);
+      margin-top: 5px;
+    }
+
+    /* ── News Card ── */
+    .news-card {
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .news-card:last-child { border-bottom: none; }
+    .news-source {
+      font-size: 0.72rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 3px;
+    }
+    .news-title {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .news-context {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    /* ── Task Item ── */
+    .task-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.7rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .task-item:last-child { border-bottom: none; }
+    .task-check {
+      width: 18px; height: 18px;
+      border-radius: 4px;
+      border: 2px solid var(--border);
+      cursor: pointer;
+      flex-shrink: 0;
+      margin-top: 2px;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s;
+    }
+    .task-check:hover { border-color: var(--green); }
+    .task-check.done {
+      background: var(--green);
+      border-color: var(--green);
+    }
+    .task-check.done::after { content: '✓'; font-size: 11px; color: #0d0f18; font-weight: 800; }
+    .task-body { flex: 1; }
+    .task-title {
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--text);
+    }
+    .task-title.done { text-decoration: line-through; color: var(--muted); }
+    .task-desc {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .task-meta {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 4px;
+      align-items: center;
+    }
+    .priority-badge {
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 1px 7px;
+      border-radius: 4px;
+    }
+    .priority-high { background: var(--red-soft); color: var(--red); }
+    .priority-normal { background: var(--blue-soft); color: var(--blue); }
+    .priority-low { background: var(--surface2); color: var(--muted); }
+    .due-date { font-size: 0.75rem; color: var(--muted); }
+
+    /* ── Payment Item ── */
+    .payment-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.7rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .payment-item:last-child { border-bottom: none; }
+    .payment-icon {
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      background: var(--purple-soft);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+    .payment-body { flex: 1; }
+    .payment-title {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .payment-notes {
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+    .payment-right { text-align: right; }
+    .payment-amount {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--purple);
+    }
+    .payment-due {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .overdue { color: var(--red) !important; }
+
+    /* ── Briefing placeholder ── */
+    .briefing-placeholder {
+      padding: 2rem;
+      text-align: center;
+      color: var(--muted);
+    }
+    .briefing-placeholder p { font-size: 0.88rem; margin-top: 0.5rem; }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      font-size: 0.75rem;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+    }
+
+    @media (max-width: 640px) {
+      main { grid-template-columns: 1fr; padding: 1rem; }
+      .full-width { grid-column: 1; }
+    }
+  </style>
+</head>
+<body>
+
+header>
+  <div class="header-left">
+    <h1>☁️ Bom dia, <span>Gustavo</span>!</h1>
+    <div class="header-date" id="dateDisplay"></div>
+  </div>
+  <div class="header-right">
+    <span class="status-dot"></span>ao vivo
+    <br>atualizado às <span id="timeDisplay"></span>
+  </div>
+</header>
+
+<main>
+
+  <!-- AGENDA -->
+  <section>
+    <div class="section-header">
+      <span class="section-icon">📅</span>
+      <h2>Agenda de hoje</h2>
+      {% set meeting_count = briefing.meetings_html | length if briefing and briefing.meetings_html else 0 %}
+      <span class="badge badge-blue">{{ tasks | length }} tarefas</span>
+    </div>
+    <div class="section-body">
+      {% if briefing and briefing.meetings_html %}
+        {{ briefing.meetings_html | safe }}
+      {% else %}
+        <div class="empty-state">
+          <span class="emoji">🎉</span>
+          Nenhuma reunião hoje — dia livre!
+        </div>
+      {% endif %}
+    </div>
+  </section>
+
+  <!-- TAREFAS -->
+  <section>
+    <div class="section-header">
+      <span class="section-icon">✅</span>
+      <h2>Tarefas</h2>
+      <span class="badge badge-green">{{ tasks | length }}</span>
+    </div>
+    <div class="section-body">
+      {% if tasks %}
+        {% for task in tasks %}
+        <div class="task-item" id="task-{{ task.id }}">
+          <div class="task-check {% if task.done %}done{% endif %}"
+               onclick="toggleTask({{ task.id }}, this)"></div>
+          <div class="task-body">
+            <div class="task-title {% if task.done %}done{% endif %}">{{ task.title }}</div>
+            {% if task.description %}
+            <div class="task-desc">{{ task.description }}</div>
+            {% endif %}
+            <div class="task-meta">
+              <span class="priority-badge priority-{{ task.priority }}">{{ task.priority }}</span>
+              {% if task.due_date %}
+              <span class="due-date">📆 {{ task.due_date }}</span>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="empty-state">
+          <span class="emoji">✨😏</span>
+          Nenhuma tarefa pendente.
+        </div>
+      {% endif %}
+    </div>
+  </section>
+
+  <!-- E-MAILS -->
+  <section>
+    <div class="section-header">
+      <span class="section-icon">📬</span>
+      <h2>E-mails importantes</h2>
+    </div>
+    <div class="section-body">
+      {% if briefing and briefing.emails_html %}
+        {{ briefing.emails_html | safe }}
+      {% else %}
+        <div class="empty-state">
+          <span class="emoji">✅</span>
+          Caixa zerada — tudo em dia!
+        </div>
+      {% endif %}
+    </div>
+  </section>
+
+  <!-- PAGAMENTOS -->
+  <section>
+    <div class="section-header">
+      <span class="section-icon">💳</span>
+      <h2>Pagamentos</h2>
+      <span class="badge badge-orange">{{ payments | length }}</span>
+    </div>
+    <div class="section-body">
+      {% if payments %}
+        {% for p in payments %}
+        <div class="payment-item">
+          <div class="payment-icon">💳</div>
+          <div class="payment-body">
+            <div class="payment-title">{{ p.title }}</div>
+            {% if p.notes %}
+            <div class="payment-notes">{{ p.notes }}</div>
+            {% endif %}
+          </div>
+          <div class="payment-right">
+            {% if p.amount %}
+            <div class="payment-amount">R$ {{ "%.2f" | format(p.amount) }}</div>
+            {% endif %}
+            {% if p.due_date %}
+            <div class="payment-due">vence {{ p.due_date }}</div>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="empty-state">
+          <span class="emoji">🙌</span>
+          Nenhum pagamento pendente.
+        </div>
+      {% endif %}
+    </div>
+  </section>
+
+  <!-- NOTÍCIAS -->
+  <section class="full-width">
+    <div class="section-header">
+      <span class="section-icon">🌍</span>
+      <h2>Notícias do dia</h2>
+    </div>
+    <div class="section-body" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:0">
+      {% if briefing and briefing.news_html %}
+        {{ briefing.news_html | safe }}
+      {% else %}
+        <div class="empty-state" style="grid-column:1/-1">
+          <span class="emoji">📰</span>
+          Notícias serão carregadas no próximo briefing matinal.
+        </div>
+      {% endif %}
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  Morning Briefing · Gustavo · <span id="footerTime"></span>
+</footer>
+
+<script>
+  // Date/time display
+  function updateTime() {
+    const now = new Date();
+    const opts = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    document.getElementById('dateDisplay').textContent =
+      now.toLocaleDateString('pt-BR', opts);
+    const t = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    document.getElementById('timeDisplay').textContent = t;
+    document.getElementById('footerTime').textContent = t;
+  }
+  updateTime();
+  setInterval(updateTime, 60000);
+
+  // Toggle task done
+  async function toggleTask(id, el) {
+    const isDone = el.classList.contains('done');
+    // optimistic UI
+    el.classList.toggle('done');
+    const titleEl = el.parentElement.querySelector('.task-title');
+    titleEl.classList.toggle('done');
+    // persist
+    await fetch(`/api/tasks/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ done: !isDone })
+    });
+  }
+</script>
+
+<script>
+// ── Push Notifications ──
+async function registerPush() {
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+
+  const reg = await navigator.serviceWorker.register('/sw.js');
+  const permission = await Notification.requestPermission();
+  if (permission !== 'granted') return;
+
+  // Get VAPID public key
+  const res = await fetch('/api/push/vapid-public-key');
+  const { publicKey } = await res.json();
+  if (!publicKey) return; // push not configured yet
+
+  const sub = await reg.pushManager.subscribe({
+    userVisibleOnly: true,
+    applicationServerKey: urlBase64ToUint8Array(publicKey)
+  });
+
+  const { endpoint, keys } = sub.toJSON();
+  await fetch('/api/push/subscribe', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ endpoint, p256dh: keys.p256dh, auth: keys.auth })
+  });
+
+  console.log('Push notifications activadas ✅');
+}
+
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = window.atob(base64);
+  return new Uint8Array([...rawData].map(c => c.charCodeAt(0)));
+}
+
+// Auto-register when page loads
+window.addEventListener('load', registerPush);
+</script>
+
+<!-- Push notification button (shown only if supported) -->
+<style>
+.push-btn {
+  position: fixed; bottom: 1.5rem; right: 1.5rem;
+  background: var(--blue); color: #fff;
+  border: none; border-radius: 999px;
+  padding: 0.6rem 1.2rem; font-size: 0.82rem; font-weight: 600;
+  cursor: pointer; box-shadow: 0 4px 20px rgba(79,142,247,0.4);
+  display: none;
+}
+</style>
+<button class="push-btn" id="pushBtn" onclick="registerPush()">🔔 Ativar notificações</button>
+<script>
+if ('serviceWorker' in navigator && 'PushManager' in window) {
+  document.getElementById('pushBtn').style.display = 'block';
+}
+</script>
+
+</body>
+</html>
