@@ -1,0 +1,17 @@
+services:
+  morning-briefing:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - briefing-data:/data
+    environment:
+      - API_KEY=${API_KEY:-change-me}
+      - DB_PATH=/data/briefing.db
+      - VAPID_PUBLIC_KEY=${VAPID_PUBLIC_KEY:-}
+      - VAPID_PRIVATE_KEY=${VAPID_PRIVATE_KEY:-}
+      - VAPID_EMAIL=${VAPID_EMAIL:-mailto:gus.quintilhano@gmail.com}
+    restart: unless-stopped
+
+volumes:
+  briefing-data:
